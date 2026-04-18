@@ -2,347 +2,145 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1a1a1a">
-<title>月交通費請求書</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Kotsuhi</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.svg">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap');
+:root {
+  --bg:#eeebe6; --surface:#fff; --border:#e0dcd6;
+  --text:#1a1a1a; --muted:#888; --accent:#1a1a1a; --fg:#fff;
+  --danger:#c0392b; --br:#c0392b; --bo:#1a6fb5;
+  --shadow:0 1px 6px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;max-width:560px;margin:0 auto;}
 
-  :root {
-    --bg: #f5f4f0;
-    --surface: #ffffff;
-    --border: #d0cec8;
-    --border-strong: #9e9a93;
-    --text: #1a1a1a;
-    --text-muted: #6b6760;
-    --accent: #1a1a1a;
-    --accent-fg: #f5f4f0;
-    --danger: #c0392b;
-    --warning-bg: #fef9e7;
-    --warning-border: #f0c040;
-    --row-hover: #f0ede8;
-    --input-bg: #faf9f7;
-  }
+/* HEADER */
+header{background:var(--accent);color:var(--fg);padding:13px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;}
+header h1{font-size:15px;font-weight:700;letter-spacing:.06em;}
+header p{font-size:10px;opacity:.5;margin-top:1px;}
+.btn-xl{background:transparent;border:1px solid rgba(255,255,255,.45);color:#fff;
+  padding:7px 13px;border-radius:5px;font-family:inherit;font-size:12px;
+  font-weight:500;cursor:pointer;white-space:nowrap;letter-spacing:.04em;}
+.btn-xl:active{background:rgba(255,255,255,.15);}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* MONTH BAR */
+.mbar{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:9px 14px;display:flex;align-items:center;gap:2px;}
+.mnav{width:34px;height:34px;border:none;background:transparent;font-size:20px;
+  cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;border-radius:50%;}
+.mnav:active{background:var(--bg);}
+.mlabel{flex:1;text-align:center;font-size:17px;font-weight:700;letter-spacing:.04em;}
+.tbadge{background:var(--accent);color:var(--fg);padding:5px 12px;border-radius:6px;
+  font-size:12px;font-weight:600;white-space:nowrap;}
 
-  body {
-    font-family: 'Noto Sans JP', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-  }
+/* CARD LIST */
+.clist{padding:12px;display:flex;flex-direction:column;gap:10px;}
 
-  /* ── HEADER ── */
-  header {
-    background: var(--accent);
-    color: var(--accent-fg);
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  header h1 {
-    font-family: 'Noto Serif JP', serif;
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-  }
-  header .subtitle {
-    font-size: 11px;
-    opacity: 0.6;
-    margin-top: 2px;
-    letter-spacing: 0.08em;
-  }
+/* CARD */
+.card{background:var(--surface);border-radius:11px;box-shadow:var(--shadow);overflow:hidden;}
+.ctop{display:flex;align-items:flex-start;padding:10px 12px 4px;gap:6px;}
+.cdate{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;padding-top:3px;min-width:58px;}
+.cvendor{flex:1;display:flex;flex-direction:column;gap:1px;overflow:hidden;}
+.vline{display:block;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cbtns{display:flex;gap:1px;flex-shrink:0;margin-left:4px;}
+.cbtn{width:28px;height:28px;border:none;background:transparent;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:15px;color:var(--muted);}
+.cbtn:active{background:var(--bg);}
+.cbtn.del{color:var(--danger);}
+.cbody{display:flex;align-items:center;padding:2px 12px 12px;gap:8px;}
+.croute{flex:1;display:flex;flex-direction:column;gap:3px;}
+.rstop{display:flex;flex-direction:column;}
+.rline{font-size:10px;color:var(--muted);letter-spacing:.02em;line-height:1.3;}
+.rstn{font-size:20px;font-weight:800;line-height:1.2;letter-spacing:-.01em;}
+.rarrow{display:flex;align-items:center;padding:1px 0;color:var(--muted);font-size:11px;gap:6px;}
+.rarrow::before{content:'';display:inline-block;width:0;height:0;
+  border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid var(--muted);}
+.camt{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;min-width:76px;}
+.dbadge{font-size:10px;font-weight:800;padding:2px 7px;border-radius:3px;letter-spacing:.06em;}
+.dbadge.r{background:var(--br);color:#fff;}
+.dbadge.o{background:var(--bo);color:#fff;}
+.aval{font-size:22px;font-weight:900;line-height:1;letter-spacing:-.02em;}
+.aunit{font-size:13px;font-weight:400;}
+.cnote{border-top:1px solid var(--border);padding:6px 12px 8px;font-size:11px;color:var(--muted);line-height:1.5;}
 
-  /* ── MONTH SELECTOR ── */
-  .month-bar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .month-nav {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .month-nav button {
-    width: 32px; height: 32px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text);
-    transition: background 0.15s;
-  }
-  .month-nav button:hover { background: var(--border); }
-  .month-display {
-    font-family: 'Noto Serif JP', serif;
-    font-size: 18px;
-    font-weight: 600;
-    min-width: 120px;
-    text-align: center;
-    letter-spacing: 0.04em;
-  }
-  .total-badge {
-    margin-left: auto;
-    background: var(--accent);
-    color: var(--accent-fg);
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.03em;
-  }
+/* ADD CARD */
+.addcard{border:2px dashed var(--border);background:transparent;border-radius:11px;
+  height:56px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .15s;width:100%;}
+.addcard:active{background:rgba(255,255,255,.5);}
+.addicon{font-size:26px;color:var(--muted);line-height:1;}
 
-  /* ── MAIN CONTENT ── */
-  main {
-    padding: 16px 20px;
-    max-width: 900px;
-    margin: 0 auto;
-  }
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);
+  z-index:100;overflow-y:auto;padding:16px 12px 48px;}
+.overlay.open{display:block;}
 
-  /* ── TABLE ── */
-  .table-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  thead th {
-    background: var(--bg);
-    border-bottom: 1px solid var(--border-strong);
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--row-hover); }
-  tbody td {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-  td.date { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--text-muted); }
-  td.amount { text-align: right; font-variant-numeric: tabular-nums; }
-  td.amount.total { font-weight: 700; }
-  td.actions {
-    text-align: right;
-    white-space: nowrap;
-  }
-  .empty-row td {
-    text-align: center;
-    padding: 40px;
-    color: var(--text-muted);
-    font-size: 13px;
-    letter-spacing: 0.05em;
-  }
+/* MODAL */
+.modal{background:var(--surface);max-width:500px;margin:0 auto;
+  border-radius:12px;overflow:hidden;box-shadow:0 8px 48px rgba(0,0,0,.32);}
+.mhead{background:var(--accent);color:var(--fg);padding:13px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:15px;font-weight:700;letter-spacing:.05em;}
+.mclose{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;
+  line-height:1;opacity:.7;padding:0 2px;}
+.mclose:active{opacity:1;}
+.mbody{padding:14px 16px;}
+.mfoot{padding:11px 16px;border-top:1px solid var(--border);
+  display:flex;justify-content:flex-end;gap:8px;background:var(--bg);}
 
-  /* ── BUTTONS ── */
-  .btn {
-    padding: 7px 14px;
-    border-radius: 4px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.03em;
-    transition: all 0.15s;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .btn-primary {
-    background: var(--accent);
-    color: var(--accent-fg);
-    border-color: var(--accent);
-  }
-  .btn-primary:hover { opacity: 0.85; }
-  .btn-outline {
-    background: transparent;
-    color: var(--text);
-    border-color: var(--border-strong);
-  }
-  .btn-outline:hover { background: var(--bg); }
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-muted);
-    border-color: transparent;
-    padding: 5px 8px;
-    font-size: 13px;
-  }
-  .btn-ghost:hover { color: var(--text); background: var(--bg); }
-  .btn-danger-ghost {
-    background: transparent;
-    color: var(--danger);
-    border-color: transparent;
-    padding: 5px 8px;
-    font-size: 13px;
-  }
-  .btn-danger-ghost:hover { background: #fdecea; }
-  .action-bar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  /* ── MODAL ── */
-  .overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .overlay.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border-radius: 8px;
-    width: 100%;
-    max-width: 480px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    overflow: hidden;
-  }
-  .modal-header {
-    background: var(--accent);
-    color: var(--accent-fg);
-    padding: 16px 20px;
-    font-family: 'Noto Serif JP', serif;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-  }
-  .modal-body { padding: 20px; }
-  .modal-footer {
-    padding: 12px 20px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    background: var(--bg);
-  }
-
-  /* ── FORM ── */
-  .form-row {
-    margin-bottom: 14px;
-  }
-  label {
-    display: block;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    margin-bottom: 5px;
-  }
-  input[type=text], input[type=date], input[type=number] {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--input-bg);
-    font-family: inherit;
-    font-size: 14px;
-    color: var(--text);
-    transition: border-color 0.15s;
-    -webkit-appearance: none;
-  }
-  input:focus {
-    outline: none;
-    border-color: var(--accent);
-    background: var(--surface);
-  }
-  .form-row-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-  .derived-field {
-    padding: 9px 12px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font-size: 14px;
-    font-variant-numeric: tabular-nums;
-    color: var(--text-muted);
-  }
-
-  /* ── WARNING ── */
-  .warning-box {
-    background: var(--warning-bg);
-    border: 1px solid var(--warning-border);
-    border-radius: 4px;
-    padding: 10px 14px;
-    font-size: 12px;
-    line-height: 1.6;
-    margin-bottom: 14px;
-    display: none;
-  }
-  .warning-box.show { display: block; }
-  .warning-icon { font-size: 14px; margin-right: 4px; }
-
-  /* ── COPY MODAL ── */
-  .copy-month-select {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 8px 0 4px;
-  }
-  .copy-month-select input[type=month] {
-    padding: 9px 12px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 14px;
-    background: var(--input-bg);
-    color: var(--text);
-  }
-  .copy-month-select input[type=month]:focus {
-    outline: none;
-    border-color: var(--accent);
-  }
-
-  /* ── RESPONSIVE ── */
-  td.route {
-    max-width: 180px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  @media (max-width: 600px) {
-    main { padding: 12px; }
-    .month-bar { padding: 10px 12px; }
-    header { padding: 12px 16px; }
-    td.route { max-width: 120px; }
-    .form-row-2 { grid-template-columns: 1fr; }
-  }
+/* FORM */
+.fsec{margin-bottom:14px;}
+.ftitle{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);
+  margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.frow{margin-bottom:9px;}
+.frow label{display:block;font-size:11px;font-weight:600;color:var(--muted);
+  margin-bottom:3px;letter-spacing:.04em;}
+input[type=text],input[type=date],input[type=number],textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:7px;
+  background:var(--bg);font-family:inherit;font-size:15px;color:var(--text);-webkit-appearance:none;}
+input:focus,textarea:focus{outline:none;border-color:var(--accent);background:#fff;}
+textarea{resize:vertical;min-height:58px;}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px;}
+.f2.single{grid-template-columns:1fr;}
+.tgrp{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+.tgl{flex:1;padding:9px 6px;border:none;background:var(--bg);font-family:inherit;
+  font-size:14px;cursor:pointer;color:var(--muted);font-weight:600;
+  transition:background .12s,color .12s;}
+.tgl.on{background:var(--accent);color:var(--fg);}
+.tgl+.tgl{border-left:1px solid var(--border);}
+.derived{padding:9px 11px;background:var(--bg);border:1px solid var(--border);
+  border-radius:7px;font-size:15px;color:var(--muted);}
+.swrow{display:flex;align-items:center;justify-content:space-between;padding:6px 0 10px;}
+.swlabel{font-size:13px;}
+.sw{position:relative;width:44px;height:26px;}
+.sw input{display:none;}
+.swt{position:absolute;inset:0;background:#ccc;border-radius:13px;cursor:pointer;transition:background .2s;}
+.sw input:checked+.swt{background:var(--accent);}
+.swt::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;
+  background:#fff;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+.sw input:checked+.swt::after{transform:translateX(18px);}
+.warnbox{background:#fef9e7;border:1px solid #e6b800;border-radius:7px;
+  padding:9px 12px;font-size:12px;line-height:1.6;margin-bottom:12px;display:none;}
+.warnbox.show{display:block;}
+.btn{padding:9px 18px;border-radius:7px;border:1px solid transparent;
+  cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;}
+.btn-p{background:var(--accent);color:var(--fg);border-color:var(--accent);}
+.btn-p:active{opacity:.85;}
+.btn-o{background:transparent;color:var(--text);border-color:var(--border);}
+.btn-o:active{background:var(--bg);}
+.btn-d{background:var(--danger);color:#fff;border-color:var(--danger);}
+.cmodal{background:var(--surface);max-width:320px;margin:60px auto;
+  border-radius:12px;overflow:hidden;box-shadow:0 8px 48px rgba(0,0,0,.32);}
+.cmodal .mhead{background:var(--danger);}
+.cmodal .mbody{padding:16px;font-size:14px;line-height:1.7;}
+.csub{font-size:12px;color:var(--muted);margin-top:6px;font-weight:600;}
 </style>
 </head>
 <body>
@@ -350,380 +148,342 @@
 <header>
   <div>
     <h1>月交通費請求書</h1>
-    <div class="subtitle">電車・バス 他</div>
+    <p>電車・バス 他</p>
   </div>
+  <button class="btn-xl" onclick="exportExcel()">Excelで保存</button>
 </header>
 
-<div class="month-bar">
-  <div class="month-nav">
-    <button onclick="changeMonth(-1)">‹</button>
-    <div class="month-display" id="monthDisplay"></div>
-    <button onclick="changeMonth(1)">›</button>
-  </div>
-  <div class="total-badge" id="totalBadge">合計 ¥0</div>
+<div class="mbar">
+  <button class="mnav" onclick="chM(-1)">‹</button>
+  <div class="mlabel" id="mlabel"></div>
+  <button class="mnav" onclick="chM(1)">›</button>
+  <div class="tbadge" id="tbadge">合計 ¥0</div>
 </div>
 
-<main>
-  <div class="action-bar">
-    <button class="btn btn-primary" onclick="openAdd()">＋ 追加</button>
-    <button class="btn btn-outline" onclick="openCopyFromHistory()">履歴からコピー</button>
-  </div>
+<div class="clist" id="clist"></div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>勤務日</th>
-          <th>業者 / 現場名</th>
-          <th>経路</th>
-          <th style="text-align:right">片道</th>
-          <th style="text-align:right">往復</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
-</main>
-
-<!-- 追加/編集モーダル -->
-<div class="overlay" id="editOverlay">
+<!-- 入力フォーム -->
+<div class="overlay" id="formOv">
   <div class="modal">
-    <div class="modal-header" id="editModalTitle">新規追加</div>
-    <div class="modal-body">
-      <div class="form-row">
-        <label>勤務日</label>
-        <input type="date" id="f_date">
-      </div>
-      <div class="form-row">
-        <label>業者 / 現場名</label>
-        <input type="text" id="f_vendor" placeholder="例：○○警備 △△ビル">
-      </div>
-      <div class="form-row">
-        <label>経路</label>
-        <input type="text" id="f_route" placeholder="例：丸ノ内線○○駅〜東西線○○駅（経由：○○駅）">
-      </div>
-      <div class="form-row-2">
-        <div>
-          <label>片道運賃（円）</label>
-          <input type="number" id="f_oneway" min="0" step="1" placeholder="0" oninput="updateRoundTrip()">
-        </div>
-        <div>
-          <label>往復運賃（自動）</label>
-          <div class="derived-field" id="f_roundtrip">0 円</div>
+    <div class="mhead">
+      <span id="ftitle">新規追加</span>
+      <button class="mclose" onclick="closeForm()">×</button>
+    </div>
+    <div class="mbody">
+      <div class="warnbox" id="cpWarn">⚠️ 月が異なるデータです。運賃の改正などがないかご注意ください！</div>
+      <!-- 基本情報 -->
+      <div class="fsec">
+        <div class="ftitle">基本情報</div>
+        <div class="frow"><label>勤務日</label><input type="date" id="f_date"></div>
+        <div class="frow"><label>業者 / 現場名</label>
+          <input type="text" id="f_vendor" placeholder="例：株式会社○○　△△現場"></div>
+        <div class="frow"><label>交通手段</label>
+          <div class="tgrp">
+            <button class="tgl on" id="t_train" onclick="setTrans('電車')">🚃 電車</button>
+            <button class="tgl"    id="t_bus"   onclick="setTrans('バス')">🚌 バス</button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeEdit()">キャンセル</button>
-      <button class="btn btn-primary" onclick="saveEdit()">保存</button>
-    </div>
-  </div>
-</div>
-
-<!-- 履歴コピーモーダル -->
-<div class="overlay" id="copyOverlay">
-  <div class="modal">
-    <div class="modal-header">履歴からコピー</div>
-    <div class="modal-body">
-      <div class="form-row">
-        <label>コピー元の月</label>
-        <input type="month" id="copySourceMonth" onchange="loadCopySource()">
+      <!-- 経路情報 -->
+      <div class="fsec">
+        <div class="ftitle">経路情報</div>
+        <div class="swrow">
+          <span class="swlabel">路線入力を省略する</span>
+          <label class="sw"><input type="checkbox" id="omitSw" onchange="toggleOmit(this.checked)"><span class="swt"></span></label>
+        </div>
+        <div class="f2" id="depRow">
+          <div><label>出発駅名</label><input type="text" id="f_depS" placeholder="本郷三丁目" list="dl_s" autocomplete="off"></div>
+          <div id="depLW"><label>出発路線</label><input type="text" id="f_depL" placeholder="丸ノ内線" list="dl_l" autocomplete="off"></div>
+        </div>
+        <div class="f2" id="arrRow">
+          <div><label>到着駅名</label><input type="text" id="f_arrS" placeholder="後楽園" list="dl_s" autocomplete="off"></div>
+          <div id="arrLW"><label>到着路線</label><input type="text" id="f_arrL" placeholder="丸ノ内線" list="dl_l" autocomplete="off"></div>
+        </div>
       </div>
-      <div id="copyWarning" class="warning-box">
-        <span class="warning-icon">⚠️</span>
-        月が異なります。運賃の改正などがないかご注意ください！
+      <!-- 料金情報 -->
+      <div class="fsec">
+        <div class="ftitle">料金情報</div>
+        <div class="frow"><label>片道 / 往復</label>
+          <div class="tgrp">
+            <button class="tgl"    id="t_one"   onclick="setDir('片道')">片道</button>
+            <button class="tgl on" id="t_round" onclick="setDir('往復')">往復</button>
+          </div>
+        </div>
+        <div class="f2">
+          <div><label>片道運賃（円）</label><input type="number" id="f_fare" min="0" step="1" placeholder="0" oninput="updTotal()"></div>
+          <div><label>請求金額（自動）</label><div class="derived" id="f_total">—</div></div>
+        </div>
       </div>
-      <div id="copyList" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;"></div>
+      <!-- 備考 -->
+      <div class="fsec">
+        <div class="ftitle">備考（任意）</div>
+        <div class="frow"><textarea id="f_note" placeholder="経由駅、特記事項など"></textarea></div>
+      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeCopy()">閉じる</button>
-      <button class="btn btn-primary" id="copyConfirmBtn" onclick="confirmCopy()" disabled>選択してコピー</button>
+    <div class="mfoot">
+      <button class="btn btn-o" onclick="closeForm()">キャンセル</button>
+      <button class="btn btn-p" onclick="saveForm()">保存</button>
     </div>
   </div>
 </div>
 
 <!-- 削除確認 -->
-<div class="overlay" id="deleteOverlay">
-  <div class="modal">
-    <div class="modal-header" style="background:#c0392b">削除の確認</div>
-    <div class="modal-body">
-      <p style="font-size:14px;line-height:1.7;">このデータを削除します。よろしいですか？</p>
-      <p style="margin-top:8px;font-size:13px;color:var(--text-muted)" id="deleteDesc"></p>
+<div class="overlay" id="delOv">
+  <div class="cmodal">
+    <div class="mhead">削除の確認</div>
+    <div class="mbody">
+      <p>このデータを削除しますか？</p>
+      <p class="csub" id="delInfo"></p>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeDelete()">キャンセル</button>
-      <button class="btn btn-primary" style="background:#c0392b;border-color:#c0392b" onclick="confirmDelete()">削除する</button>
+    <div class="mfoot">
+      <button class="btn btn-o" onclick="closeDel()">キャンセル</button>
+      <button class="btn btn-d" onclick="confirmDel()">削除する</button>
     </div>
   </div>
 </div>
 
+<datalist id="dl_s"></datalist>
+<datalist id="dl_l"></datalist>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+// ── STORAGE ──
+const mem={};
+const st={
+  get(k){try{return localStorage.getItem(k);}catch{return mem[k]??null;}},
+  set(k,v){try{localStorage.setItem(k,v);}catch{mem[k]=v;}},
+  keys(){try{return Object.keys(localStorage).filter(k=>k.startsWith('kh_'));}
+    catch{return Object.keys(mem).filter(k=>k.startsWith('kh_'));}}
+};
+
+// ── SETTINGS ──
+let cfg=(()=>{try{return JSON.parse(st.get('kh_cfg')||'{}');}catch{return{};}})();
+if(cfg.omit===undefined)cfg.omit=true;
+const saveCfg=()=>st.set('kh_cfg',JSON.stringify(cfg));
+
+// ── RECORDS ──
+const rk=(y,m)=>`kh_${y}_${String(m).padStart(2,'0')}`;
+const loadR=(y,m)=>{try{return JSON.parse(st.get(rk(y,m))||'[]');}catch{return[];}};
+const saveR=(y,m,a)=>st.set(rk(y,m),JSON.stringify(a));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
 // ── STATE ──
-let currentYear, currentMonth; // 1-indexed month
-let editingId = null;
-let deleteTargetId = null;
-let copySelectedIds = new Set();
+let Y,M,editId=null,delId=null,fMode=null;
+const WD=['日','月','火','水','木','金','土'];
+const fmtD=s=>{const d=new Date(s+'T00:00:00');return`${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}）`;};
 
-function getKey(y, m) {
-  return `kotsuhi_${y}_${String(m).padStart(2,'0')}`;
-}
+// ── VENDOR DISPLAY ──
+const vFS=n=>n<=4?'18px':n<=7?'15px':n<=11?'12px':n<=15?'10px':'9px';
+const vHtml=v=>v.split(/[\s\u3000]+/).filter(Boolean)
+  .map(l=>`<span class="vline" style="font-size:${vFS(l.length)}">${esc(l)}</span>`).join('');
 
-function loadRecords(y, m) {
-  try {
-    return JSON.parse(localStorage.getItem(getKey(y, m)) || '[]');
-  } catch { return []; }
-}
-
-function saveRecords(y, m, records) {
-  localStorage.setItem(getKey(y, m), JSON.stringify(records));
-}
-
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
-
-// ── INIT ──
-(function init() {
-  const now = new Date();
-  currentYear = now.getFullYear();
-  currentMonth = now.getMonth() + 1;
-  render();
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  }
-})();
-
-// ── MONTH NAV ──
-function changeMonth(delta) {
-  currentMonth += delta;
-  if (currentMonth > 12) { currentMonth = 1; currentYear++; }
-  if (currentMonth < 1) { currentMonth = 12; currentYear--; }
-  render();
+// ── AUTOCOMPLETE ──
+function fillDL(){
+  const S=new Set(),L=new Set();
+  st.keys().filter(k=>/^kh_\d{4}_\d{2}$/.test(k)).forEach(k=>{
+    try{JSON.parse(st.get(k)||'[]').forEach(r=>{
+      if(r.depS)S.add(r.depS);if(r.arrS)S.add(r.arrS);
+      if(r.depL)L.add(r.depL);if(r.arrL)L.add(r.arrL);
+    });}catch{}
+  });
+  const fill=(id,set)=>{const e=document.getElementById(id);if(e)e.innerHTML=[...set].map(s=>`<option value="${esc(s)}">`).join('');};
+  fill('dl_s',S);fill('dl_l',L);
 }
 
 // ── RENDER ──
-function render() {
-  const monthStr = `${currentYear}年${currentMonth}月`;
-  document.getElementById('monthDisplay').textContent = monthStr;
+function render(){
+  document.getElementById('mlabel').textContent=`${Y}年${M}月`;
+  const recs=loadR(Y,M).sort((a,b)=>a.date.localeCompare(b.date));
+  const tot=recs.reduce((s,r)=>s+(r.dir==='往復'?r.fare*2:r.fare),0);
+  document.getElementById('tbadge').textContent=`合計 ¥${tot.toLocaleString()}`;
 
-  const records = loadRecords(currentYear, currentMonth);
-  records.sort((a, b) => a.date.localeCompare(b.date));
+  const cards=recs.map(r=>{
+    const billed=r.dir==='往復'?r.fare*2:r.fare;
+    const bc=r.dir==='往復'?'r':'o';
+    const dL=(!cfg.omit&&r.depL)?`<span class="rline">${esc(r.depL)}</span>`:'';
+    const aL=(!cfg.omit&&r.arrL)?`<span class="rline">${esc(r.arrL)}</span>`:'';
+    const note=r.note?`<div class="cnote">📝 ${esc(r.note)}</div>`:'';
+    return`<div class="card">
+      <div class="ctop">
+        <div class="cdate">${fmtD(r.date)}</div>
+        <div class="cvendor">${vHtml(r.vendor||'（未入力）')}</div>
+        <div class="cbtns">
+          <button class="cbtn" onclick="openEdit('${r.id}')" title="編集">✏️</button>
+          <button class="cbtn" onclick="openCopy('${r.id}')" title="コピー">📋</button>
+          <button class="cbtn del" onclick="openDel('${r.id}')" title="削除">✕</button>
+        </div>
+      </div>
+      <div class="cbody">
+        <div class="croute">
+          <div class="rstop">${dL}<span class="rstn">${esc(r.depS||'？')}</span></div>
+          <div class="rarrow"></div>
+          <div class="rstop">${aL}<span class="rstn">${esc(r.arrS||'？')}</span></div>
+        </div>
+        <div class="camt">
+          <span class="dbadge ${bc}">${r.dir}</span>
+          <span class="aval">${billed.toLocaleString()}<span class="aunit">円</span></span>
+        </div>
+      </div>${note}
+    </div>`;
+  }).join('');
 
-  const total = records.reduce((s, r) => s + r.oneway * 2, 0);
-  document.getElementById('totalBadge').textContent = `合計 ¥${total.toLocaleString()}`;
-
-  const tbody = document.getElementById('tableBody');
-  if (records.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">この月のデータはありません</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = records.map(r => `
-    <tr>
-      <td class="date">${formatDate(r.date)}</td>
-      <td>${esc(r.vendor)}</td>
-      <td class="route">${esc(r.route)}</td>
-      <td class="amount">¥${r.oneway.toLocaleString()}</td>
-      <td class="amount total">¥${(r.oneway * 2).toLocaleString()}</td>
-      <td class="actions">
-        <button class="btn btn-ghost" onclick="openEdit('${r.id}')">編集</button>
-        <button class="btn btn-danger-ghost" onclick="openDelete('${r.id}')">削除</button>
-      </td>
-    </tr>
-  `).join('');
+  document.getElementById('clist').innerHTML=cards+`<button class="addcard" onclick="openAdd()"><span class="addicon">＋</span></button>`;
 }
 
-function formatDate(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  return `${d.getMonth()+1}/${d.getDate()}（${['日','月','火','水','木','金','土'][d.getDay()]}）`;
+// ── FORM OPEN ──
+function defDate(){
+  const n=new Date();
+  return(n.getFullYear()===Y&&n.getMonth()+1===M)?n.toISOString().slice(0,10):`${Y}-${String(M).padStart(2,'0')}-01`;
+}
+function openAdd(){
+  fMode='add';editId=null;
+  document.getElementById('ftitle').textContent='新規追加';
+  clearF();document.getElementById('f_date').value=defDate();
+  document.getElementById('cpWarn').classList.remove('show');
+  openF();
+}
+function openEdit(id){
+  fMode='edit';editId=id;
+  document.getElementById('ftitle').textContent='編集';
+  const r=loadR(Y,M).find(x=>x.id===id);if(!r)return;
+  fillF(r);document.getElementById('cpWarn').classList.remove('show');
+  openF();
+}
+function openCopy(id){
+  fMode='copy';editId=null;
+  document.getElementById('ftitle').textContent='コピーして追加';
+  const r=loadR(Y,M).find(x=>x.id===id);if(!r)return;
+  fillF(r);
+  document.getElementById('f_date').value=defDate();
+  // 元レコードの月と現在表示月が異なれば警告
+  const sd=new Date(r.date+'T00:00:00');
+  if(sd.getFullYear()!==Y||sd.getMonth()+1!==M)
+    document.getElementById('cpWarn').classList.add('show');
+  else
+    document.getElementById('cpWarn').classList.remove('show');
+  openF();
+}
+function openF(){fillDL();syncOmit();document.getElementById('formOv').classList.add('open');setTimeout(()=>document.getElementById('f_date').focus(),80);}
+function closeForm(){document.getElementById('formOv').classList.remove('open');}
+
+// ── FORM FILL/CLEAR ──
+function clearF(){
+  ['f_date','f_vendor','f_depS','f_depL','f_arrS','f_arrL','f_note'].forEach(id=>document.getElementById(id).value='');
+  setTrans('電車');setDir('往復');
+  document.getElementById('f_fare').value='';
+  document.getElementById('f_total').textContent='—';
+}
+function fillF(r){
+  document.getElementById('f_vendor').value=r.vendor||'';
+  document.getElementById('f_depS').value=r.depS||'';
+  document.getElementById('f_depL').value=r.depL||'';
+  document.getElementById('f_arrS').value=r.arrS||'';
+  document.getElementById('f_arrL').value=r.arrL||'';
+  document.getElementById('f_note').value=r.note||'';
+  document.getElementById('f_fare').value=r.fare||'';
+  setTrans(r.transport||'電車');setDir(r.dir||'往復');updTotal();
 }
 
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// ── TOGGLES ──
+function setTrans(v){
+  document.getElementById('t_train').classList.toggle('on',v==='電車');
+  document.getElementById('t_bus').classList.toggle('on',v==='バス');
+}
+function getTrans(){return document.getElementById('t_train').classList.contains('on')?'電車':'バス';}
+function setDir(v){
+  document.getElementById('t_one').classList.toggle('on',v==='片道');
+  document.getElementById('t_round').classList.toggle('on',v==='往復');
+  updTotal();
+}
+function getDir(){return document.getElementById('t_one').classList.contains('on')?'片道':'往復';}
+function updTotal(){
+  const f=parseInt(document.getElementById('f_fare').value)||0;
+  const t=getDir()==='往復'?f*2:f;
+  document.getElementById('f_total').textContent=t>0?`${t.toLocaleString()} 円`:'—';
 }
 
-// ── ADD ──
-function openAdd() {
-  editingId = null;
-  document.getElementById('editModalTitle').textContent = '新規追加';
-  const today = new Date();
-  // デフォルトは現在表示中の月の1日
-  const d = `${currentYear}-${String(currentMonth).padStart(2,'0')}-01`;
-  document.getElementById('f_date').value = d;
-  document.getElementById('f_vendor').value = '';
-  document.getElementById('f_route').value = '';
-  document.getElementById('f_oneway').value = '';
-  document.getElementById('f_roundtrip').textContent = '0 円';
-  document.getElementById('editOverlay').classList.add('open');
-  setTimeout(() => document.getElementById('f_date').focus(), 50);
+// ── OMIT ──
+function syncOmit(){
+  const o=cfg.omit;
+  document.getElementById('omitSw').checked=o;
+  document.getElementById('depLW').style.display=o?'none':'';
+  document.getElementById('arrLW').style.display=o?'none':'';
+  document.getElementById('depRow').className='f2'+(o?' single':'');
+  document.getElementById('arrRow').className='f2'+(o?' single':'');
 }
+function toggleOmit(v){cfg.omit=v;saveCfg();syncOmit();render();}
 
-// ── EDIT ──
-function openEdit(id) {
-  const records = loadRecords(currentYear, currentMonth);
-  const r = records.find(x => x.id === id);
-  if (!r) return;
-  editingId = id;
-  document.getElementById('editModalTitle').textContent = '編集';
-  document.getElementById('f_date').value = r.date;
-  document.getElementById('f_vendor').value = r.vendor;
-  document.getElementById('f_route').value = r.route;
-  document.getElementById('f_oneway').value = r.oneway;
-  document.getElementById('f_roundtrip').textContent = (r.oneway * 2).toLocaleString() + ' 円';
-  document.getElementById('editOverlay').classList.add('open');
-}
-
-function closeEdit() {
-  document.getElementById('editOverlay').classList.remove('open');
-}
-
-function updateRoundTrip() {
-  const v = parseInt(document.getElementById('f_oneway').value) || 0;
-  document.getElementById('f_roundtrip').textContent = (v * 2).toLocaleString() + ' 円';
-}
-
-function saveEdit() {
-  const date = document.getElementById('f_date').value;
-  const vendor = document.getElementById('f_vendor').value.trim();
-  const route = document.getElementById('f_route').value.trim();
-  const oneway = parseInt(document.getElementById('f_oneway').value) || 0;
-
-  if (!date || !vendor || !oneway) {
-    alert('勤務日・業者/現場名・片道運賃は必須です。');
-    return;
-  }
-
-  const records = loadRecords(currentYear, currentMonth);
-  if (editingId) {
-    const i = records.findIndex(x => x.id === editingId);
-    if (i >= 0) records[i] = { ...records[i], date, vendor, route, oneway };
-  } else {
-    records.push({ id: genId(), date, vendor, route, oneway });
-  }
-  saveRecords(currentYear, currentMonth, records);
-  closeEdit();
-  render();
+// ── SAVE ──
+function saveForm(){
+  const date=document.getElementById('f_date').value;
+  const vendor=document.getElementById('f_vendor').value.trim();
+  const depS=document.getElementById('f_depS').value.trim();
+  const arrS=document.getElementById('f_arrS').value.trim();
+  const fare=parseInt(document.getElementById('f_fare').value)||0;
+  if(!date||!vendor||!depS||!arrS||!fare){alert('勤務日・業者/現場名・出発駅・到着駅・運賃は必須です。');return;}
+  const rec={
+    id:fMode==='edit'?editId:uid(),date,vendor,
+    transport:getTrans(),
+    depS,depL:document.getElementById('f_depL').value.trim(),
+    arrS,arrL:document.getElementById('f_arrL').value.trim(),
+    dir:getDir(),fare,
+    note:document.getElementById('f_note').value.trim(),
+  };
+  const recs=loadR(Y,M);
+  if(fMode==='edit'){const i=recs.findIndex(x=>x.id===editId);if(i>=0)recs[i]=rec;else recs.push(rec);}
+  else recs.push(rec);
+  saveR(Y,M,recs);closeForm();render();
 }
 
 // ── DELETE ──
-function openDelete(id) {
-  deleteTargetId = id;
-  const records = loadRecords(currentYear, currentMonth);
-  const r = records.find(x => x.id === id);
-  if (r) {
-    document.getElementById('deleteDesc').textContent =
-      `${formatDate(r.date)}　${r.vendor}　片道¥${r.oneway.toLocaleString()}`;
-  }
-  document.getElementById('deleteOverlay').classList.add('open');
+function openDel(id){
+  delId=id;
+  const r=loadR(Y,M).find(x=>x.id===id);
+  if(r)document.getElementById('delInfo').textContent=`${fmtD(r.date)}　${r.vendor}`;
+  document.getElementById('delOv').classList.add('open');
 }
+function closeDel(){document.getElementById('delOv').classList.remove('open');delId=null;}
+function confirmDel(){if(!delId)return;saveR(Y,M,loadR(Y,M).filter(x=>x.id!==delId));closeDel();render();}
 
-function closeDelete() {
-  document.getElementById('deleteOverlay').classList.remove('open');
-  deleteTargetId = null;
-}
+// ── MONTH ──
+function chM(d){M+=d;if(M>12){M=1;Y++;}if(M<1){M=12;Y--;}render();}
 
-function confirmDelete() {
-  if (!deleteTargetId) return;
-  const records = loadRecords(currentYear, currentMonth).filter(x => x.id !== deleteTargetId);
-  saveRecords(currentYear, currentMonth, records);
-  closeDelete();
-  render();
-}
-
-// ── COPY FROM HISTORY ──
-function openCopyFromHistory() {
-  copySelectedIds.clear();
-  // デフォルト：前月
-  let y = currentYear, m = currentMonth - 1;
-  if (m < 1) { m = 12; y--; }
-  document.getElementById('copySourceMonth').value = `${y}-${String(m).padStart(2,'0')}`;
-  document.getElementById('copyConfirmBtn').disabled = true;
-  loadCopySource();
-  document.getElementById('copyOverlay').classList.add('open');
-}
-
-function closeCopy() {
-  document.getElementById('copyOverlay').classList.remove('open');
-}
-
-function loadCopySource() {
-  const val = document.getElementById('copySourceMonth').value;
-  if (!val) return;
-  const [sy, sm] = val.split('-').map(Number);
-
-  // 月違い警告
-  const warning = document.getElementById('copyWarning');
-  if (sy !== currentYear || sm !== currentMonth) {
-    warning.classList.add('show');
-  } else {
-    warning.classList.remove('show');
-  }
-
-  const records = loadRecords(sy, sm);
-  records.sort((a, b) => a.date.localeCompare(b.date));
-
-  const list = document.getElementById('copyList');
-  if (records.length === 0) {
-    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;">この月にデータはありません</div>';
-    return;
-  }
-
-  copySelectedIds.clear();
-  list.innerHTML = records.map(r => `
-    <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px;" onchange="updateCopyBtn()">
-      <input type="checkbox" value="${r.id}" data-vendor="${esc(r.vendor)}" data-route="${esc(r.route)}" data-oneway="${r.oneway}">
-      <span style="flex:1">
-        <span style="color:var(--text-muted);margin-right:8px">${formatDate(r.date)}</span>
-        <strong>${esc(r.vendor)}</strong>
-        ${r.route ? `<span style="color:var(--text-muted);margin-left:6px">${esc(r.route)}</span>` : ''}
-      </span>
-      <span style="font-variant-numeric:tabular-nums;color:var(--text-muted)">往復 ¥${(r.oneway*2).toLocaleString()}</span>
-    </label>
-  `).join('');
-}
-
-function updateCopyBtn() {
-  const checked = document.querySelectorAll('#copyList input[type=checkbox]:checked');
-  document.getElementById('copyConfirmBtn').disabled = checked.length === 0;
-}
-
-function confirmCopy() {
-  const sourceVal = document.getElementById('copySourceMonth').value;
-  const [sy, sm] = sourceVal.split('-').map(Number);
-  const sourceRecords = loadRecords(sy, sm);
-
-  const checked = document.querySelectorAll('#copyList input[type=checkbox]:checked');
-  const targetRecords = loadRecords(currentYear, currentMonth);
-
-  checked.forEach(cb => {
-    const src = sourceRecords.find(r => r.id === cb.value);
-    if (!src) return;
-    // 日付は現在月の同じ日に変換（末日超えは末日に丸める）
-    const srcDay = new Date(src.date + 'T00:00:00').getDate();
-    const lastDay = new Date(currentYear, currentMonth, 0).getDate();
-    const newDay = Math.min(srcDay, lastDay);
-    const newDate = `${currentYear}-${String(currentMonth).padStart(2,'0')}-${String(newDay).padStart(2,'0')}`;
-    targetRecords.push({
-      id: genId(),
-      date: newDate,
-      vendor: src.vendor,
-      route: src.route,
-      oneway: src.oneway,
-    });
+// ── EXCEL ──
+function exportExcel(){
+  if(typeof XLSX==='undefined'){alert('Excel機能の読み込みに失敗しました。オンライン環境で再試行してください。');return;}
+  const recs=loadR(Y,M).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!recs.length){alert('この月のデータがありません。');return;}
+  const tot=recs.reduce((s,r)=>s+(r.dir==='往復'?r.fare*2:r.fare),0);
+  const rows=[
+    ['月交通費請求書（電車・バス 他）','','',`合計請求額：¥${tot.toLocaleString()}`,''],
+    ['氏名：','','','',''],
+    ['勤務日','業者/現場名','経路','片道（円）','往復（円）'],
+  ];
+  recs.forEach(r=>{
+    const dep=cfg.omit?r.depS:(r.depL?`${r.depL} ${r.depS}`:r.depS);
+    const arr=cfg.omit?r.arrS:(r.arrL?`${r.arrL} ${r.arrS}`:r.arrS);
+    const route=`${dep} → ${arr}`+(r.note?`\n備考：${r.note}`:'');
+    rows.push([fmtD(r.date),r.vendor,route,r.fare,r.dir==='往復'?r.fare*2:'']);
   });
-
-  saveRecords(currentYear, currentMonth, targetRecords);
-  closeCopy();
-  render();
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:16},{wch:26},{wch:34},{wch:10},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,ws,`${M}月`);
+  XLSX.writeFile(wb,`交通費_${Y}年${M}月.xlsx`);
 }
 
-// キーボード閉じ
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    closeEdit(); closeCopy(); closeDelete();
-  }
-});
+// ── UTIL ──
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeForm();closeDel();}});
+
+// ── INIT ──
+(()=>{
+  const n=new Date();Y=n.getFullYear();M=n.getMonth()+1;
+  render();
+  if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+})();
 </script>
 </body>
 </html>
