@@ -41,12 +41,14 @@ header p{font-size:10px;opacity:.5;margin-top:1px;}
 .rline{font-size:10px;color:var(--muted);letter-spacing:.02em;line-height:1.3;}
 .rstn{font-size:18px;font-weight:800;line-height:1.2;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .rarrow{flex-shrink:0;width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:9px solid var(--muted);margin-bottom:4px;}
-.camt{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;min-width:76px;}
-.dbadge{font-size:10px;font-weight:800;padding:2px 7px;border-radius:3px;letter-spacing:.06em;}
+.camt{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:2px;min-width:80px;}
+.camt-row{display:flex;align-items:center;gap:6px;}
+.dbadge{font-size:10px;font-weight:800;padding:2px 7px;border-radius:3px;letter-spacing:.06em;flex-shrink:0;}
 .dbadge.r{background:var(--br);color:#fff;}
 .dbadge.o{background:var(--bo);color:#fff;}
 .aval{font-size:22px;font-weight:900;line-height:1;letter-spacing:-.02em;}
 .aunit{font-size:13px;font-weight:400;}
+.asub{font-size:11px;color:var(--muted);text-align:right;line-height:1;}
 .cnote{border-top:1px solid var(--border);padding:6px 12px 8px;font-size:11px;color:var(--muted);line-height:1.5;}
 .addcard{border:2px dashed var(--border);background:transparent;border-radius:11px;height:56px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:100%;}
 .addcard:active{background:rgba(255,255,255,.5);}
@@ -268,6 +270,7 @@ function render(){
     const dL=(!cfg.omit&&r.depL)?`<span class="rline">${esc(r.depL)}</span>`:'';
     const aL=(!cfg.omit&&r.arrL)?`<span class="rline">${esc(r.arrL)}</span>`:'';
     const note=r.note?`<div class="cnote">📝 ${esc(r.note)}</div>`:'';
+    const sub=r.dir==='往復'?`<div class="asub">（${r.fare.toLocaleString()}円）</div>`:'';
     return`<div class="card">
       <div class="ctop">
         <div class="cdate">${fmtD(r.date)}</div>
@@ -285,8 +288,11 @@ function render(){
           <div class="rstop">${aL}<span class="rstn">${esc(r.arrS||'？')}</span></div>
         </div>
         <div class="camt">
-          <span class="dbadge ${bc}">${r.dir}</span>
-          <span class="aval">${billed.toLocaleString()}<span class="aunit">円</span></span>
+          <div class="camt-row">
+            <span class="dbadge ${bc}">${r.dir}</span>
+            <span class="aval">${billed.toLocaleString()}<span class="aunit">円</span></span>
+          </div>
+          ${sub}
         </div>
       </div>${note}
     </div>`;
@@ -312,7 +318,9 @@ function openCopy(id){fMode='copy';editId=null;document.getElementById('ftitle')
 function openF(){fillDL();syncOmit();document.getElementById('formOv').classList.add('open');setTimeout(()=>document.getElementById('f_date').focus(),80);}
 function closeForm(){document.getElementById('formOv').classList.remove('open');}
 function clearF(){['f_date','f_vendor','f_depS','f_depL','f_arrS','f_arrL','f_note'].forEach(id=>document.getElementById(id).value='');setDir('往復');document.getElementById('f_fare').value='';document.getElementById('f_total').textContent='—';}
-function fillF(r){document.getElementById('f_vendor').value=r.vendor||'';
+function fillF(r){
+document.getElementById('f_date').value=r.date||'';
+document.getElementById('f_vendor').value=r.vendor||'';
 document.getElementById('f_depS').value=r.depS||'';
 document.getElementById('f_depL').value=r.depL||'';
 document.getElementById('f_arrS').value=r.arrS||'';
@@ -352,53 +360,58 @@ function exportExcel(){
   const recs=loadR(Y,M).sort((a,b)=>a.date.localeCompare(b.date));
   if(!recs.length){alert('この月のデータがありません。');return;}
 
-  // テンプレート読み込み
+  // テンプレート読み込み（cellStylesでスタイル保持）
   const bin=atob(TMPL_B64);
   const arr=new Uint8Array(bin.length);
   for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
-  const wb=XLSX.read(arr,{type:'array',cellStyles:true});
+  const wb=XLSX.read(arr,{type:'array',cellStyles:true,sheetStubs:true});
   const ws=wb.Sheets['電車・バス・他'];
+
+  // セルにスタイルを保持しながら値だけ上書きするヘルパー
+  const setCell=(addr,val,type)=>{
+    const existing=ws[addr]||{};
+    ws[addr]={...existing,v:val,t:type};
+    if(!ws[addr].s)ws[addr].s={};
+  };
 
   const name=getName();
   const tot=recs.reduce((s,r)=>s+(r.dir==='往復'?r.fare*2:r.fare),0);
 
-  // 氏名・合計請求額（左面）
-  ws['B4']={...ws['B4'],v:name,t:'s'};
-  ws['D4']={v:tot,t:'n'};
-
-  // 氏名・合計請求額（右面） - 右面は空のままでOK（同じ値入れる場合）
-  ws['H4']={...ws['H4'],v:name,t:'s'};
-  ws['J4']={v:'',t:'s'};
+  // 氏名・合計請求額（左面）: 合計はF4（'円'の位置）
+  setCell('B4',name,'s');
+  setCell('F4',`${tot.toLocaleString()}円`,'s');
+  // 氏名・合計請求額（右面）
+  setCell('H4',name,'s');
+  setCell('L4',`${tot.toLocaleString()}円`,'s');
 
   // 行マッピング: 7,9,11,...55 = 25行/面
   const dataRows=[7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55];
 
   recs.forEach((r,i)=>{
-    const row=dataRows[i % 25];
+    const row=dataRows[i%25];
     const isRight=i>=25;
     const dep=cfg.omit?r.depS:(r.depL?`${r.depL} ${r.depS}`:r.depS);
     const arr2=cfg.omit?r.arrS:(r.arrL?`${r.arrL} ${r.arrS}`:r.arrS);
     const route=`${dep} → ${arr2}`;
-    const roundtrip=r.dir==='往復'?r.fare*2:null;
+    const fareStr=`${r.fare.toLocaleString()}円`;
+    const roundStr=r.dir==='往復'?`${(r.fare*2).toLocaleString()}円`:'';
 
     if(!isRight){
-      // 左面: A,B,C,E,F
-      ws[`A${row}`]={v:fmtD(r.date),t:'s'};
-      ws[`B${row}`]={v:r.vendor,t:'s'};
-      ws[`C${row}`]={v:route,t:'s'};
-      ws[`E${row}`]={v:r.fare,t:'n'};
-      ws[`F${row}`]=roundtrip?{v:roundtrip,t:'n'}:{v:'',t:'s'};
-    } else {
-      // 右面: G,H,I,K,L
-      ws[`G${row}`]={v:fmtD(r.date),t:'s'};
-      ws[`H${row}`]={v:r.vendor,t:'s'};
-      ws[`I${row}`]={v:route,t:'s'};
-      ws[`K${row}`]={v:r.fare,t:'n'};
-      ws[`L${row}`]=roundtrip?{v:roundtrip,t:'n'}:{v:'',t:'s'};
+      setCell(`A${row}`,fmtD(r.date),'s');
+      setCell(`B${row}`,r.vendor,'s');
+      setCell(`C${row}`,route,'s');
+      setCell(`E${row}`,fareStr,'s');
+      setCell(`F${row}`,roundStr,'s');
+    }else{
+      setCell(`G${row}`,fmtD(r.date),'s');
+      setCell(`H${row}`,r.vendor,'s');
+      setCell(`I${row}`,route,'s');
+      setCell(`K${row}`,fareStr,'s');
+      setCell(`L${row}`,roundStr,'s');
     }
   });
 
-  const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true});
   const blob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download=`交通費_${Y}年${M}月.xlsx`;a.click();URL.revokeObjectURL(url);
