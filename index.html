@@ -350,16 +350,29 @@ function render(){
   document.getElementById('clist').innerHTML=cards+'<button class="addcard" onclick="openAdd()"><span class="addicon">＋</span></button>';
 }
 
+// 今日を含む期間にY,Mをセット
+function jumpToToday(){
+  const n=new Date();
+  const ty=n.getFullYear(),tm=n.getMonth()+1,td=n.getDate();
+  if(cfg.cycle==='20日〆'&&td>=21){
+    // 今日が21日以降 → 翌月が「当月」
+    M=tm+1;Y=ty;
+    if(M>12){M=1;Y++;}
+  }else{
+    Y=ty;M=tm;
+  }
+}
+
 function getName(){return st.get('kh_name')||'';}
 function renderHeader(){
   document.getElementById('hNameText').textContent=getName()||'氏名未設定';
-  document.getElementById('hCycleText').textContent=cfg.cycle; // ③ 正しい値のみ保存されているのでそのまま表示
+  document.getElementById('hCycleText').textContent=cfg.cycle;
 }
 function openSettings(){document.getElementById('f_name').value=getName();syncCycleUI();document.getElementById('settingsOv').classList.add('open');setTimeout(()=>document.getElementById('f_name').focus(),80);}
 function closeSettings(){document.getElementById('settingsOv').classList.remove('open');}
 function setNameCycle(v){cfg.cycle=v;syncCycleUI();}
 function syncCycleUI(){const is20=cfg.cycle==='20日〆';document.getElementById('ns_month').classList.toggle('on',!is20);document.getElementById('ns_20').classList.toggle('on',is20);}
-function saveSettings(){st.set('kh_name',document.getElementById('f_name').value.trim());saveCfg();renderHeader();render();closeSettings();}
+function saveSettings(){st.set('kh_name',document.getElementById('f_name').value.trim());saveCfg();jumpToToday();renderHeader();render();closeSettings();}
 
 function defDate(){const n=new Date();return(n.getFullYear()===Y&&n.getMonth()+1===M)?n.toISOString().slice(0,10):`${Y}-${String(M).padStart(2,'0')}-01`;}
 function openAdd(){fMode='add';editId=null;document.getElementById('ftitle').textContent='新規追加';clearF();document.getElementById('f_date').value=defDate();document.getElementById('cpWarn').classList.remove('show');openF();}
@@ -504,6 +517,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeForm();closeDe
 
 (()=>{
   const n=new Date();Y=n.getFullYear();M=n.getMonth()+1;
+  jumpToToday();
   renderHeader();render();
   if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
